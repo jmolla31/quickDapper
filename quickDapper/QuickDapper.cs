@@ -15,6 +15,14 @@ namespace quickDapper
         private static readonly ConcurrentDictionary<Type, TableObject> MainTableCache = new ConcurrentDictionary<Type, TableObject>();
         private static readonly ConcurrentDictionary<Type, PartialTableObject> PartialTableCache = new ConcurrentDictionary<Type, PartialTableObject>();
 
+        /// <summary>
+        /// Register a new table in the main table cache.
+        /// </summary>
+        /// <typeparam name="T">Class mapping the table</typeparam>
+        /// <param name="query">Enable/Disable SELECT statement generation</param>
+        /// <param name="insert">Enable/Disable INSERT statement generation</param>
+        /// <param name="update">Enable/Disable UPDATE statement generation</param>
+        /// <returns>Returns a the generated TableObject that can be stored to check the generated values but normally it should be ignored.</returns>
         public static TableObject RegisterTable<T>(bool query = true, bool insert = true, bool update = true) where T : class
         {
             var type = typeof(T);
@@ -41,6 +49,14 @@ namespace quickDapper
             return (MainTableCache.TryAdd(type, tableObject)) ? tableObject : throw new Exception("Error adding tableObject to dictionary");
         }
 
+        /// <summary>
+        /// Registers a new partial table that references a full TableObject registered earlier.
+        /// </summary>
+        /// <typeparam name="T">Class partially mapping the table.</typeparam>
+        /// <param name="query">Enable/Disable SELECT statement generation</param>
+        /// <param name="insert">Enable/Disable INSERT statement generation</param>
+        /// <param name="update">Enable/Disable UPDATE statement generation</param>
+        /// <returns></returns>
         public static PartialTableObject RegisterPartial<T>(bool query = true, bool insert = true, bool update = true) where T : class
         {
             var type = typeof(T);
@@ -65,6 +81,12 @@ namespace quickDapper
             return (PartialTableCache.TryAdd(type, partialTable)) ? partialTable : throw new Exception("Error adding partialTableObject to dictionary");
         }
 
+        /// <summary>
+        /// Generates a SELECT statement with the provided values
+        /// </summary>
+        /// <param name="tableName">Table name in the database</param>
+        /// <param name="properties">Properties (database columns) to be included in the statement</param>
+        /// <returns></returns>
         private static string QueryConstructor(string tableName, PropertyInfo[] properties)
         {
             const string Separator = ", ";
@@ -83,12 +105,20 @@ namespace quickDapper
             return sqlString;
         }
 
+        /// <summary>
+        /// Generates a UPDATE statement for the provided values, 
+        /// doesn't include the primary key and fields marked with the ServerField attribute
+        /// </summary>
+        /// <param name="tableName">Table name in the database</param>
+        /// <param name="pKey">PrimaryKey column</param>
+        /// <param name="properties">Properties (database columns) to be included in the statement</param>
+        /// <returns></returns>
         private static string UpdateConstructor(string tableName, string pKey, PropertyInfo[] properties)
         {
             const string Separator = ", ";
 
             string sqlString = $"UPDATE {tableName} SET ";
-
+                
             foreach (var prop in properties)
             {
                 if (!Attribute.IsDefined(prop, typeof(ServerFieldAttribute)) && prop.Name != pKey)
@@ -102,6 +132,14 @@ namespace quickDapper
             return sqlString;
         }
 
+        /// <summary>
+        /// Generates a INSERT statement for the provided values
+        /// doesn't include the primary key and fields marked with the ServerField attribute
+        /// </summary>
+        /// <param name="tableName">Table name in the database</param>
+        /// <param name="pKey">PrimaryKey column</param>
+        /// <param name="properties">Properties (database columns) to be included in the statement</param>
+        /// <returns></returns>
         private static string InsertConstructor(string tableName, string pKey, PropertyInfo[] properties)
         {
             const string Separator = ", ";
@@ -122,6 +160,14 @@ namespace quickDapper
             return sqlString;
         }
 
+        /// <summary>
+        /// Finds one entity filtered by primary key using the generated SELECT statement<para/>
+        /// Returns the result mapped to the provided class
+        /// </summary>
+        /// <typeparam name="Entity">Entity that's going to be queried</typeparam>
+        /// <param name="dbConn">Database Connection</param>
+        /// <param name="primaryKey">Primary key value to be queried</param>
+        /// <returns></returns>
         public static async Task<Entity> FindOne<Entity>(this IDbConnection dbConn, dynamic primaryKey) where Entity : class
         {
             var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
@@ -136,6 +182,13 @@ namespace quickDapper
             return result;
         }
 
+        /// <summary>
+        /// Finds all rows of an entity using the generated SELECT statement<para/>
+        /// Returns the result mapped to an IEnumerable of the provided class
+        /// </summary>
+        /// <typeparam name="Entity">Entity that's going to be queried</typeparam>
+        /// <param name="dbConn">Database Connection</param>
+        /// <returns></returns>
         public static async Task<IEnumerable<Entity>> GetAll<Entity>(this IDbConnection dbConn) where Entity : class
         {
             var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
@@ -148,6 +201,14 @@ namespace quickDapper
             return result;
         }
 
+        /// <summary>
+        /// Inserts a new entry in the databse using the generated INSERT statement<para/>
+        /// Returns the number of rows affected by the statement
+        /// </summary>
+        /// <typeparam name="Entity"></typeparam>
+        /// <param name="dbConn">Database connection</param>
+        /// <param name="insertModel">Class containing the data to insert</param>
+        /// <returns></returns>
         public static async Task<int> CreateAsync<Entity>(this IDbConnection dbConn, object insertModel) where Entity : class
         {
             //TODO:  Check it's not a partial, mark models with some key???
@@ -161,6 +222,14 @@ namespace quickDapper
             return result;
         }
 
+        /// <summary>
+        /// Updates an entry in the database using the generated UPDATE statement<para/>
+        /// Returns the number of rows affected by the statement
+        /// </summary>
+        /// <typeparam name="Entity"></typeparam>
+        /// <param name="dbConn"></param>
+        /// <param name="updateModel">Class containing the data to insert</param>
+        /// <returns></returns>
         public static async Task<int> UpdateAsync<Entity>(this IDbConnection dbConn, object updateModel) where Entity : class
         {
             //TODO:  Check it's not a partial, mark models with some key???
@@ -174,6 +243,14 @@ namespace quickDapper
             return result;
         }
 
+        /// <summary>
+        /// Updates an entry in the database using a partial model instead of the full TableObject<para/>
+        /// Returns the number of rows affected by the statement
+        /// </summary>
+        /// <typeparam name="Partial"></typeparam>
+        /// <param name="dbConn"></param>
+        /// <param name="updateModel"></param>
+        /// <returns></returns>
         public static async Task<int> PartialUpdateAsync<Partial>(this IDbConnection dbConn, object updateModel) where Partial : class
         {
             var isCached = PartialTableCache.TryGetValue(typeof(Partial), out PartialTableObject cachedPartial);
