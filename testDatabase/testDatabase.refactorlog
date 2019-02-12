@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Operations Version="1.0" xmlns="http://schemas.microsoft.com/sqlserver/dac/Serialization/2012/02">
+  <Operation Name="Rename Refactor" Key="5b381c57-0bf0-4295-bc2c-76c06d1f2e50" ChangeDateTime="02/12/2019 11:14:46">
+    <Property Name="ElementName" Value="[dbo].[Events].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Events]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BikeSerial" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="80a50830-9a00-414e-a259-ce2767b5cdcf" ChangeDateTime="02/12/2019 11:20:58">
+    <Property Name="ElementName" Value="[dbo].[Events].[BikeSerial]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Events]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Id" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="610c4781-6e93-49ad-8d60-27e318c795f5" ChangeDateTime="02/12/2019 11:21:18">
+    <Property Name="ElementName" Value="[dbo].[Events].[Model]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Events]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Name" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="782483b6-5bde-44a3-8326-6ff0082f7e85" ChangeDateTime="02/12/2019 11:21:24">
+    <Property Name="ElementName" Value="[dbo].[Events].[Manufacturer]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Events]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Description" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="509d4b23-2bc8-4721-88b6-008712e331b7" ChangeDateTime="02/12/2019 11:22:03">
+    <Property Name="ElementName" Value="[dbo].[Events].[Displacement]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Events]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="MaxParticipants" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="12dcc5ae-cf16-47ca-a1b7-f4f465047e8e" ChangeDateTime="02/12/2019 11:22:06">
+    <Property Name="ElementName" Value="[dbo].[Events].[Bought]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Events]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="Date" />
+  </Operation>
+  <Operation Name="Rename Refactor" Key="9f2aea22-809a-4c3a-a264-b785d4fd9196" ChangeDateTime="02/12/2019 11:25:50">
+    <Property Name="ElementName" Value="[dbo].[Bikes].[Id]" />
+    <Property Name="ElementType" Value="SqlSimpleColumn" />
+    <Property Name="ParentElementName" Value="[dbo].[Bikes]" />
+    <Property Name="ParentElementType" Value="SqlTable" />
+    <Property Name="NewName" Value="BikeNumber" />
+  </Operation>
+</Operations>
