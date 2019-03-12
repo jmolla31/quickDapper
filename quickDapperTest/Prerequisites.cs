@@ -9,12 +9,11 @@ namespace quickDapperTest
 {
     public class Prerequisites
     {
-        private const string SqlString = @"Data Source=hunchhunch.database.windows.net;Initial Catalog=hunchhunch;Persist Security Info=False;User ID=krieger;Password=ReadABook!;Pooling=False;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False";
 
         [Fact]
         public async void TestSqlConnection()
         {
-            var connection = new SqlConnection(SqlString);
+            var connection = new SqlConnection();
 
             await connection.OpenAsync();
             var sVersion = connection.ServerVersion;

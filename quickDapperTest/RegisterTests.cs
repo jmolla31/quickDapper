@@ -12,7 +12,6 @@ namespace quickDapperTest
 {
     public class RegisterTests
     {
-        private const string SqlString = @"";
 
         [Fact]
         public void RegisterTables()
