@@ -220,6 +220,7 @@ namespace quickDapper
 
             var sqlString = cachedTable.InsertString;
 
+            //TODO: Return identity of last insert instead of rows affected. If possible, add optional configuration bool to choose between the options
             var result = await dbConn.ExecuteAsync(sqlString, insertModel);
 
             return result;
