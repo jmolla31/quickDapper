@@ -8,7 +8,7 @@ namespace quickDapperTest.Models
     [PartialModel(typeof(Bike))]
     public class BikeMini
     {
-        public int Id { get; set; }
         public string Name { get; set; }
+        public string Manufacturer { get; set; }
     }
 }
