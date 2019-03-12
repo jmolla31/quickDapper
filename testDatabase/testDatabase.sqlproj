@@ -65,4 +65,7 @@
   <ItemGroup>
     <RefactorLog Include="testDatabase.refactorlog" />
   </ItemGroup>
+  <ItemGroup>
+    <PostDeploy Include="Populate.PostDeployment1.sql" />
+  </ItemGroup>
 </Project>
