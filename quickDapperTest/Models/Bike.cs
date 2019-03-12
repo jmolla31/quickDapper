@@ -5,6 +5,7 @@ using System.Text;
 
 namespace quickDapperTest.Models
 {
+    [TableName("Bikes")]
     public class Bike
     {
         [PKey]
