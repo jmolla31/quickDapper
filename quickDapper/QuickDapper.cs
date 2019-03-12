@@ -19,11 +19,12 @@ namespace quickDapper
         /// Register a new table in the main table cache.
         /// </summary>
         /// <typeparam name="T">Class mapping the table</typeparam>
+        /// <param name="appendS">Enable/Disable appending an 's' char at the end when generating the table name</param>
         /// <param name="query">Enable/Disable SELECT statement generation</param>
         /// <param name="insert">Enable/Disable INSERT statement generation</param>
         /// <param name="update">Enable/Disable UPDATE statement generation</param>
         /// <returns>Returns a the generated TableObject that can be stored to check the generated values but normally it should be ignored.</returns>
-        public static TableObject RegisterTable<T>(bool query = true, bool insert = true, bool update = true) where T : class
+        public static TableObject RegisterTable<T>(bool appendS = true, bool query = true, bool insert = true, bool update = true) where T : class
         {
             var type = typeof(T);
             var propList = type.GetProperties();
@@ -31,6 +32,8 @@ namespace quickDapper
 
             var tableNameAttr = attrList.FirstOrDefault(x => x.AttributeType.Name == "TableNameAttribute");
             var tableName = (tableNameAttr != null) ? tableNameAttr.ConstructorArguments[0].Value as string : type.Name;
+
+            if (appendS) tableName += "s";
 
             var pKeyAttr = propList.FirstOrDefault(prop => Attribute.IsDefined(prop, typeof(PKeyAttribute)));
             var pKey = (pKeyAttr != null) ? pKeyAttr.Name : propList.Single(prop => prop.Name == "Id").Name;
