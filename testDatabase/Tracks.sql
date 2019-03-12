@@ -1,6 +1,6 @@
 ﻿CREATE TABLE [dbo].[Tracks]
 (
-	[Id] INT NOT NULL PRIMARY KEY, 
+	[Id] INT NOT NULL PRIMARY KEY IDENTITY, 
     [Name] NVARCHAR(MAX) NOT NULL, 
     [Location] NVARCHAR(MAX) NOT NULL, 
     [DirtTrack] BIT NOT NULL DEFAULT 0, 
