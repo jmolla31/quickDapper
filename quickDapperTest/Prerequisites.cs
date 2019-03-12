@@ -13,7 +13,7 @@ namespace quickDapperTest
         [Fact]
         public async void TestSqlConnection()
         {
-            var connection = new SqlConnection();
+            var connection = new SqlConnection(Secrets.SqlString);
 
             await connection.OpenAsync();
             var sVersion = connection.ServerVersion;

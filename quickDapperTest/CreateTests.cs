@@ -13,7 +13,7 @@ namespace quickDapperTest
         [Fact]
         public async void CreateBike()
         {
-            var connection = new SqlConnection();
+            var connection = new SqlConnection(Secrets.SqlString);
 
             var registerBike = QuickDapper.RegisterTable<Bike>();
             Assert.NotNull(registerBike.QueryString);

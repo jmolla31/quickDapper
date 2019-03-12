@@ -254,7 +254,7 @@ namespace quickDapper
         /// <param name="dbConn"></param>
         /// <param name="updateModel"></param>
         /// <returns></returns>
-        public static async Task<int> PartialUpdateAsync<Partial>(this IDbConnection dbConn, object updateModel) where Partial : class
+        public static async Task<int> UpdatePartialAsync<Partial>(this IDbConnection dbConn, object updateModel) where Partial : class
         {
             var isCached = PartialTableCache.TryGetValue(typeof(Partial), out PartialTableObject cachedPartial);
             if (!isCached) cachedPartial = RegisterPartial<Partial>();

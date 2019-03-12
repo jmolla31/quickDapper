@@ -18,7 +18,7 @@ namespace quickDapperTest
         [Fact]
         public async void SelectBike()
         {
-            var connection = new SqlConnection();
+            var connection = new SqlConnection(Secrets.SqlString);
 
             var registerBike = QuickDapper.RegisterTable<Bike>();
             var registerMiniBike = QuickDapper.RegisterPartial<BikeMini>();
