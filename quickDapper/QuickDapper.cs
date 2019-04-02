@@ -11,9 +11,27 @@ namespace quickDapper
 {
     public static class QuickDapper
     {
-        //TODO: Remove "runtime" registering in methods and change to a normal Dictionary, forcing developers to register all tables at startup time.
-        private static readonly IDictionary<Type, TableObject> MainTableCache = new Dictionary<Type, TableObject>();
-        private static readonly IDictionary<Type, PartialTableObject> PartialTableCache = new Dictionary<Type, PartialTableObject>();
+        private static IDictionary<Type, TableObject> MainTableCache;
+        private static IDictionary<Type, PartialTableObject> PartialTableCache;
+
+        public static void BuildCaches(CacheType cacheType)
+        {
+            if (cacheType == CacheType.BuildAtStartup)
+            {
+                MainTableCache = new Dictionary<Type, TableObject>();
+                PartialTableCache= new Dictionary<Type, PartialTableObject>();
+            }
+            else if (cacheType == CacheType.Concurrent)
+            {
+                MainTableCache = new ConcurrentDictionary<Type, TableObject>();
+                PartialTableCache = new ConcurrentDictionary<Type, PartialTableObject>();
+            }
+            else //WTF?? How dafuq we ended up in here bruh?
+            {
+                throw new Exception("Yeah mate, something went REALLY wrong with this code");
+            }
+        }
+
 
         /// <summary>
         /// Register a new table in the main table cache.
