@@ -1,4 +1,5 @@
 ﻿using Dapper;
+using quickDapper.QueryBuilders;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -44,7 +45,7 @@ namespace quickDapper
                 Type = type,
                 TableName = tableName,
                 PrimaryKey = pKey,
-                QueryString = (query) ? QueryConstructor(tableName, propList) : null,
+                QueryString = (query) ? QueryBuilder(tableName, propList) : null,
                 InsertString = (insert) ? InsertConstructor(tableName, pKey, propList) : null,
                 UpdateString = (update) ? UpdateConstructor(tableName, pKey, propList) : null
             };
@@ -76,36 +77,12 @@ namespace quickDapper
             var partialTable = new PartialTableObject()
             {
                 MainTable = referencedTable,
-                QueryString = (query) ? QueryConstructor(mainTable.TableName, propList) : null,
+                QueryString = (query) ? QueryBuilder.BuildQuery(mainTable.TableName, propList) : null,
                 InsertString = (insert) ? InsertConstructor(mainTable.TableName, mainTable.PrimaryKey, propList) : null,
                 UpdateString = (update) ? UpdateConstructor(mainTable.TableName, mainTable.PrimaryKey, propList) : null
             };
 
             return (PartialTableCache.TryAdd(type, partialTable)) ? partialTable : throw new Exception("Error adding partialTableObject to dictionary");
-        }
-
-        /// <summary>
-        /// Generates a SELECT statement with the provided values
-        /// </summary>
-        /// <param name="tableName">Table name in the database</param>
-        /// <param name="properties">Properties (database columns) to be included in the statement</param>
-        /// <returns></returns>
-        private static string QueryConstructor(string tableName, PropertyInfo[] properties)
-        {
-            const string Separator = ", ";
-
-            string sqlString = "SELECT ";
-
-            foreach (var prop in properties)
-            {
-                sqlString += prop.Name;
-                sqlString += Separator;
-            }
-
-            sqlString = sqlString.Substring(0, sqlString.Length - 2);
-            sqlString += $" FROM {tableName}";
-
-            return sqlString;
         }
 
         /// <summary>
