@@ -45,9 +45,9 @@ namespace quickDapper
                 Type = type,
                 TableName = tableName,
                 PrimaryKey = pKey,
-                QueryString = (query) ? QueryBuilder(tableName, propList) : null,
-                InsertString = (insert) ? InsertConstructor(tableName, pKey, propList) : null,
-                UpdateString = (update) ? UpdateConstructor(tableName, pKey, propList) : null
+                QueryString = (query) ? QueryBuilder.BuildQuery(tableName, propList) : null,
+                InsertString = (insert) ? InsertBuilder.BuildQuery(tableName, pKey, propList) : null,
+                UpdateString = (update) ? UpdateBuilder.BuildQuery(tableName, pKey, propList) : null
             };
 
             return (MainTableCache.TryAdd(type, tableObject)) ? tableObject : throw new Exception("Error adding tableObject to dictionary");
@@ -78,67 +78,13 @@ namespace quickDapper
             {
                 MainTable = referencedTable,
                 QueryString = (query) ? QueryBuilder.BuildQuery(mainTable.TableName, propList) : null,
-                InsertString = (insert) ? InsertConstructor(mainTable.TableName, mainTable.PrimaryKey, propList) : null,
-                UpdateString = (update) ? UpdateConstructor(mainTable.TableName, mainTable.PrimaryKey, propList) : null
+                InsertString = (insert) ? InsertBuilder.BuildQuery(mainTable.TableName, mainTable.PrimaryKey, propList) : null,
+                UpdateString = (update) ? UpdateBuilder.BuildQuery(mainTable.TableName, mainTable.PrimaryKey, propList) : null
             };
 
             return (PartialTableCache.TryAdd(type, partialTable)) ? partialTable : throw new Exception("Error adding partialTableObject to dictionary");
         }
 
-        /// <summary>
-        /// Generates a UPDATE statement for the provided values, 
-        /// doesn't include the primary key and fields marked with the ServerField attribute
-        /// </summary>
-        /// <param name="tableName">Table name in the database</param>
-        /// <param name="pKey">PrimaryKey column</param>
-        /// <param name="properties">Properties (database columns) to be included in the statement</param>
-        /// <returns></returns>
-        private static string UpdateConstructor(string tableName, string pKey, PropertyInfo[] properties)
-        {
-            const string Separator = ", ";
-
-            string sqlString = $"UPDATE {tableName} SET ";
-                
-            foreach (var prop in properties)
-            {
-                if (!Attribute.IsDefined(prop, typeof(ServerFieldAttribute)) && prop.Name != pKey)
-                {
-                    sqlString += $"{prop.Name} = @{prop.Name}";
-                    sqlString += Separator;
-                }
-            }
-            sqlString = sqlString.Substring(0, sqlString.Length - 2);
-            sqlString += $" WHERE {pKey} = @{pKey}";
-            return sqlString;
-        }
-
-        /// <summary>
-        /// Generates a INSERT statement for the provided values
-        /// doesn't include the primary key and fields marked with the ServerField attribute
-        /// </summary>
-        /// <param name="tableName">Table name in the database</param>
-        /// <param name="pKey">PrimaryKey column</param>
-        /// <param name="properties">Properties (database columns) to be included in the statement</param>
-        /// <returns></returns>
-        private static string InsertConstructor(string tableName, string pKey, PropertyInfo[] properties)
-        {
-            const string Separator = ", ";
-
-            string sqlString = $"INSERT INTO {tableName} VALUES (";
-
-            foreach (var prop in properties)
-            {
-                if (!Attribute.IsDefined(prop, typeof(ServerFieldAttribute)) && prop.Name != pKey)
-                {
-                    sqlString += $"@{prop.Name}";
-                    sqlString += Separator;
-                }
-            }
-            sqlString = sqlString.Substring(0, sqlString.Length - 2);
-            sqlString += ")";
-
-            return sqlString;
-        }
 
         /// <summary>
         /// Finds one entity filtered by primary key using the generated SELECT statement<para/>
