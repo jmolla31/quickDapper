@@ -12,8 +12,8 @@ namespace quickDapper
     public static class QuickDapper
     {
         //TODO: Remove "runtime" registering in methods and change to a normal Dictionary, forcing developers to register all tables at startup time.
-        private static readonly ConcurrentDictionary<Type, TableObject> MainTableCache = new ConcurrentDictionary<Type, TableObject>();
-        private static readonly ConcurrentDictionary<Type, PartialTableObject> PartialTableCache = new ConcurrentDictionary<Type, PartialTableObject>();
+        private static readonly IDictionary<Type, TableObject> MainTableCache = new Dictionary<Type, TableObject>();
+        private static readonly IDictionary<Type, PartialTableObject> PartialTableCache = new Dictionary<Type, PartialTableObject>();
 
         /// <summary>
         /// Register a new table in the main table cache.
@@ -174,7 +174,7 @@ namespace quickDapper
         public static async Task<Entity> FindOne<Entity>(this IDbConnection dbConn, dynamic primaryKey) where Entity : class
         {
             var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
-            if (!isCached) cachedTable = RegisterTable<Entity>();
+            if (!isCached) throw new KeyNotFoundException($"Error, key {typeof(Entity)} not found in table cache.");
 
             var sqlString = $"{cachedTable.QueryString} WHERE {cachedTable.PrimaryKey} = @PrimaryKey";
 
@@ -195,7 +195,7 @@ namespace quickDapper
         public static async Task<IEnumerable<Entity>> GetAll<Entity>(this IDbConnection dbConn) where Entity : class
         {
             var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
-            if (!isCached) cachedTable = RegisterTable<Entity>();
+            if (!isCached) throw new KeyNotFoundException($"Error, key {typeof(Entity)} not found in table cache.");
 
             var sqlString = cachedTable.QueryString;
 
@@ -216,7 +216,7 @@ namespace quickDapper
         {
             //TODO:  Check it's not a partial, mark models with some key???
             var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
-            if (!isCached) cachedTable = RegisterTable<Entity>();
+            if (!isCached) throw new KeyNotFoundException($"Error, key {typeof(Entity)} not found in table cache.");
 
             var sqlString = cachedTable.InsertString;
 
@@ -238,7 +238,7 @@ namespace quickDapper
         {
             //TODO:  Check it's not a partial, mark models with some key???
             var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
-            if (!isCached) cachedTable = RegisterTable<Entity>();
+            if (!isCached) throw new KeyNotFoundException($"Error, key {typeof(Entity)} not found in table cache.");
 
             var sqlString = cachedTable.UpdateString;
 
@@ -258,7 +258,7 @@ namespace quickDapper
         public static async Task<int> UpdatePartialAsync<Partial>(this IDbConnection dbConn, object updateModel) where Partial : class
         {
             var isCached = PartialTableCache.TryGetValue(typeof(Partial), out PartialTableObject cachedPartial);
-            if (!isCached) cachedPartial = RegisterPartial<Partial>();
+            if (!isCached) throw new KeyNotFoundException($"Error, key {typeof(Partial)} not found in partial table cache.");
 
             var sqlString = cachedPartial.UpdateString;
 
