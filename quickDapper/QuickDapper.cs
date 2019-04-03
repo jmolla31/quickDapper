@@ -207,6 +207,26 @@ namespace quickDapper
 
             return result;
         }
+
+        /// <summary>
+        /// Deletes one row (entity) from database based on the provided primary key value
+        /// </summary>
+        /// <typeparam name="Entity"></typeparam>
+        /// <param name="dbConn"></param>
+        /// <param name="primaryKey"></param>
+        /// <returns>Operation result</returns>
+        public static async Task<bool> DeleteAsync<Entity>(this IDbConnection dbConn, dynamic primaryKey) where Entity : class
+        {
+            var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
+            if (!isCached) throw new KeyNotFoundException($"Error, key {typeof(Entity)} not found in table cache.");
+
+            string sqlString = $"DELETE FROM {cachedTable.TableName} WHERE {cachedTable.PrimaryKey} = @PrimaryKey";
+            var queryParams = new { PrimaryKey = primaryKey };
+
+            var result = await dbConn.ExecuteAsync(sqlString, queryParams);
+
+            return (result != 0) ? true : false;
+        }
     }
 }
 
