@@ -17,7 +17,7 @@ namespace quickDapper
 
         public static void BuildCaches(CacheType cacheType)
         {
-            if (cacheType == CacheType.BuildAtStartup)
+            if (cacheType == CacheType.Standard)
             {
                 MainTableCache = new Dictionary<Type, TableObject>();
                 PartialTableCache= new Dictionary<Type, PartialTableObject>();
@@ -57,12 +57,16 @@ namespace quickDapper
             var pKeyAttr = propList.FirstOrDefault(prop => Attribute.IsDefined(prop, typeof(PKeyAttribute)));
             var pKey = (pKeyAttr != null) ? pKeyAttr.Name : propList.Single(prop => prop.Name == "Id").Name;
 
+            var sdKeyAttr = propList.FirstOrDefault(prop => Attribute.IsDefined(prop, typeof(SoftDeleteKeyAttribute)));
+            var sdKey = sdKeyAttr?.Name;
+
 
             var tableObject = new TableObject()
             {
                 Type = type,
                 TableName = tableName,
                 PrimaryKey = pKey,
+                SoftDeleteKey = sdKey,
                 QueryString = (query) ? QueryBuilder.BuildQuery(tableName, propList) : null,
                 InsertString = (insert) ? InsertBuilder.BuildQuery(tableName, pKey, propList) : null,
                 UpdateString = (update) ? UpdateBuilder.BuildQuery(tableName, pKey, propList) : null
@@ -102,7 +106,6 @@ namespace quickDapper
 
             return (PartialTableCache.TryAdd(type, partialTable)) ? partialTable : throw new Exception("Error adding partialTableObject to dictionary");
         }
-
 
         /// <summary>
         /// Finds one entity filtered by primary key using the generated SELECT statement<para/>
@@ -207,6 +210,57 @@ namespace quickDapper
 
             return result;
         }
+
+        /// <summary>
+        /// Deletes one row (entity) from database based on the provided primary key value
+        /// </summary>
+        /// <typeparam name="Entity"></typeparam>
+        /// <param name="dbConn"></param>
+        /// <param name="primaryKey"></param>
+        /// <returns>Operation result</returns>
+        public static async Task<bool> DeleteAsync<Entity>(this IDbConnection dbConn, dynamic primaryKey) where Entity : class
+        {
+            var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
+            if (!isCached) throw new KeyNotFoundException($"Error, key {typeof(Entity)} not found in table cache.");
+
+            string sqlString = $"DELETE FROM {cachedTable.TableName} WHERE {cachedTable.PrimaryKey} = @PrimaryKey";
+            var queryParams = new { PrimaryKey = primaryKey };
+
+            var result = await dbConn.ExecuteAsync(sqlString, queryParams);
+
+            return (result != 0) ? true : false;
+        }
+
+        public static async Task<bool> SoftDeleteAsync<Entity>(this IDbConnection dbConn, dynamic primaryKey) where Entity : class
+        {
+            var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
+            if (!isCached) throw new KeyNotFoundException($"Error, key {typeof(Entity)} not found in table cache.");
+
+            if (string.IsNullOrEmpty(cachedTable.SoftDeleteKey)) throw new KeyNotFoundException($"Error, soft delete key of {typeof(Entity)} is null.");
+
+            string sqlString = $"UPDATE {cachedTable.TableName} SET {cachedTable.SoftDeleteKey} = 1 WHERE {cachedTable.PrimaryKey} = @PrimaryKey";
+            var queryParams = new { PrimaryKey = primaryKey };
+
+            var result = await dbConn.ExecuteAsync(sqlString, queryParams);
+
+            return (result != 0) ? true : false;
+        }
+
+        public static async Task<bool> RevertSoftDeleteAsync<Entity>(this IDbConnection dbConn, dynamic primaryKey) where Entity : class
+        {
+            var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
+            if (!isCached) throw new KeyNotFoundException($"Error, key {typeof(Entity)} not found in table cache.");
+
+            if (string.IsNullOrEmpty(cachedTable.SoftDeleteKey)) throw new KeyNotFoundException($"Error, soft delete key of {typeof(Entity)} is null.");
+
+            string sqlString = $"UPDATE {cachedTable.TableName} SET {cachedTable.SoftDeleteKey} = 0 WHERE {cachedTable.PrimaryKey} = @PrimaryKey";
+            var queryParams = new { PrimaryKey = primaryKey };
+
+            var result = await dbConn.ExecuteAsync(sqlString, queryParams);
+
+            return (result != 0) ? true : false;
+        }
+
     }
 }
 

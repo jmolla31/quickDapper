@@ -9,6 +9,7 @@ namespace quickDapper
         public Type Type { get; set; }
         public string TableName { get; set; }
         public string PrimaryKey { get; set; }
+        public string SoftDeleteKey { get; set; }
         public string QueryString { get; set; }
         public string InsertString { get; set; }
         public string UpdateString { get; set; }

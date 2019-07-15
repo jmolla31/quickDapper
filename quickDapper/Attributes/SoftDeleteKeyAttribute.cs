@@ -4,9 +4,7 @@ using System.Text;
 
 namespace quickDapper
 {
-    public enum CacheType
+    public class SoftDeleteKeyAttribute : Attribute
     {
-        Standard = 0,
-        Concurrent = 1
     }
 }
