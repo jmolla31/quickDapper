@@ -115,7 +115,7 @@ namespace quickDapper
         /// <param name="dbConn">Database Connection</param>
         /// <param name="primaryKey">Primary key value to be queried</param>
         /// <returns></returns>
-        public static async Task<Entity> FindOne<Entity>(this IDbConnection dbConn, dynamic primaryKey) where Entity : class
+        public static async Task<Entity> FindOne<Entity>(this IDbConnection dbConn, object primaryKey) where Entity : class
         {
             var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
             if (!isCached) throw new KeyNotFoundException($"Error, key {typeof(Entity)} not found in table cache.");
@@ -218,7 +218,7 @@ namespace quickDapper
         /// <param name="dbConn"></param>
         /// <param name="primaryKey"></param>
         /// <returns>Operation result</returns>
-        public static async Task<bool> DeleteAsync<Entity>(this IDbConnection dbConn, dynamic primaryKey) where Entity : class
+        public static async Task<bool> DeleteAsync<Entity>(this IDbConnection dbConn, object primaryKey) where Entity : class
         {
             var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
             if (!isCached) throw new KeyNotFoundException($"Error, key {typeof(Entity)} not found in table cache.");
@@ -231,7 +231,7 @@ namespace quickDapper
             return (result != 0) ? true : false;
         }
 
-        public static async Task<bool> SoftDeleteAsync<Entity>(this IDbConnection dbConn, dynamic primaryKey) where Entity : class
+        public static async Task<bool> SoftDeleteAsync<Entity>(this IDbConnection dbConn, object primaryKey) where Entity : class
         {
             var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
             if (!isCached) throw new KeyNotFoundException($"Error, key {typeof(Entity)} not found in table cache.");
@@ -246,7 +246,7 @@ namespace quickDapper
             return (result != 0) ? true : false;
         }
 
-        public static async Task<bool> RevertSoftDeleteAsync<Entity>(this IDbConnection dbConn, dynamic primaryKey) where Entity : class
+        public static async Task<bool> RevertSoftDeleteAsync<Entity>(this IDbConnection dbConn, object primaryKey) where Entity : class
         {
             var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
             if (!isCached) throw new KeyNotFoundException($"Error, key {typeof(Entity)} not found in table cache.");
