@@ -231,6 +231,13 @@ namespace quickDapper
             return (result != 0) ? true : false;
         }
 
+        /// <summary>
+        /// Soft deletes one row (entity) from database based on the provided primary key value by setting the softDelete key to 1
+        /// </summary>
+        /// <typeparam name="Entity"></typeparam>
+        /// <param name="dbConn"></param>
+        /// <param name="primaryKey"></param>
+        /// <returns>Operation result</returns>
         public static async Task<bool> SoftDeleteAsync<Entity>(this IDbConnection dbConn, object primaryKey) where Entity : class
         {
             var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
@@ -246,6 +253,13 @@ namespace quickDapper
             return (result != 0) ? true : false;
         }
 
+        /// <summary>
+        /// Reverts a soft delete for one row (entity) from the database based on the provided primary key value by setting the softDelete key to 0
+        /// </summary>
+        /// <typeparam name="Entity"></typeparam>
+        /// <param name="dbConn"></param>
+        /// <param name="primaryKey"></param>
+        /// <returns>Operation result</returns>
         public static async Task<bool> RevertSoftDeleteAsync<Entity>(this IDbConnection dbConn, object primaryKey) where Entity : class
         {
             var isCached = MainTableCache.TryGetValue(typeof(Entity), out TableObject cachedTable);
